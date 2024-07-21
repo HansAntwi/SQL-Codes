@@ -5,5 +5,9 @@ SQL Script for:
 4. CTEs
 5. Temp Table and 
 6. Views
+7. Joins
 
-For a Church to analyse the amount of funds availble for Local, District and the Conference. 
+
+
+Church -----For a Church to analyse the amount of funds availble for Local, District and the Conference. 
+Covid Project-- Project done with AlexTheAnalyst
