@@ -12,3 +12,5 @@ SQL Script for:
 Church -----For a Church to analyse the amount of funds availble for Local, District and the Conference. 
 
 Covid Project-- Project done with AlexTheAnalyst
+
+NashvilleHousing Data Cleaning ----Project done with AlexTheAnalyst
