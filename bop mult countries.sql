@@ -293,7 +293,13 @@ from CurrentAccountBalance
 
 select * from RateofCABVar
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- GPD
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+----INVESTMENT GDP
+Create view view_Investment_GDP AS
 select Year, Country,
 ROUND(SUM(CASE
 			WHEN Indicator = 'Gross Fixed Capital Formation' THEN Nominal
@@ -307,4 +313,102 @@ ROUND(sum(case
 		end),2) as [Real Investment]
 from Gh_Nig_GDP
 group by Year, Country
+
+
+select * from view_Investment_GDP
+
+
+
+select gdp.Year, gdp.Country, gdp.Indicator, gdp.[Nominal], gdp.[Real], rate.[Exchange Rate], round(SUM(gdp.[Nominal]/rate.[Exchange Rate]),2) as [Deflated Nominal], ROUND(SUM(gdp.[Real]/rate.[Exchange Rate]),2) as [Deflated Real]
+from Gh_Nig_GDP gdp
+join ExchangeRates rate
+on rate.year = gdp.Year and gdp.Country = rate.Country
+--where gdp.Year = 2020
+group by gdp.Year, gdp.country, gdp.Indicator, gdp.[Nominal], gdp.[Real], rate.[Exchange Rate]
+
+
+
+
+select * from Gh_Nig_GDP
+where year = 2020
+-- gdp real constant gdp rate of var for both
+
+
+---GDP VIEW
+create view  view_GDP as
+select Year, Country, 
+sum(case when Indicator = 'Gross Domestic Product' then Nominal
+end) as [Nominal GDP],
+sum(case when Indicator = 'Gross Domestic Product' then Real
+end) as [Real GDP]
+from Gh_Nig_GDP
+group by [Year], Country
+
+select * from view_GDP
+
+
+--GDP variation
+Create view view_GDP_Variation as
+select *, 
+ROUND(COALESCE(([Nominal GDP]-LAG([Nominal GDP]) over (PARTITION BY Country ORDER BY YEAR))/LAG([Nominal GDP]) over (PARTITION BY Country order by Year)*100,0),2) as [Nom_GDP Variation],
+
+ROUND(COALESCE(([Real GDP]-LAG([Real GDP]) over (PARTITION BY Country order by year))/LAG([Real GDP] ) over (partition by Country order by Year)*100,0),2) as [Real_GDP Variation]
+from view_GDP
+
+select * from view_GDP_Variation
+where [Year] between 2016 and 2020
+order by year, Country
+--current-prv/prev
+
+
+Select * from Gh_Nig_GDP
+where (Indicator like '%export%' OR Indicator like '%import%')
+and 
+ --year = 2014 and 
+ Country = 'nigeria'
+order by 2,1,5
+
+
+---GDP EXPORTS
+Create view view_NetExports_GDP AS
+Select Year, Country,
+ROUND(sum(case when Indicator = 'Exports of Goods and Services' THEN [Real] end)-SUM(case when Indicator = 'Imports of Goods and Services' then [Real] end),2) as NetExport_Real_GDP,
+
+ROUND(sum(case when Indicator = 'Exports of Goods and Services' THEN [Nominal] end)-SUM(case when Indicator = 'Imports of Goods and Services' then [Nominal] end),2) as NetExport_Nom_GDP
+
+from Gh_Nig_GDP
+group by [Year], Country
+
+
+select * from view_NetExports_GDP
+
+GO
+-------NET EXPORT VARIATION
+--cur-prv/prv
+Create view view_Var_NetExports_GDP AS
+select Year, Country,
+
+ROUND(COALESCE(([NetExport_Real_GDP]-LAG([NetExport_Real_GDP]) over (partition by country order by Year))/LAG([NetExport_Real_GDP]) over (partition by country order by year),0)*100,2) Var_NetRealExport_GDP,
+
+ROUND(COALESCE(([NetExport_Nom_GDP]-LAG([NetExport_Nom_GDP]) over (partition by country order by Year))/LAG([NetExport_Nom_GDP]) over (partition by country order by year),0)*100,2) Var_NetNormExport_GDP
+
+from view_NetExports_GDP
+GO
+
+select * from view_Var_NetExports_GDP
+
+
+
+select * from view_NetExports_GDP
+where year between 2014 and 2016
+and country = 'nigeria'
+
+Select * from Gh_Nig_GDP
+where (Indicator like '%export%' OR Indicator like '%import%')
+and 
+ year = 2015 and 
+ Country = 'nigeria'
+order by 2,1,5
+
+
 
