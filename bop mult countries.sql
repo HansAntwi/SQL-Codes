@@ -294,7 +294,17 @@ from CurrentAccountBalance
 select * from RateofCABVar
 
 
-SELECT * from CurrentAccountBalance
-SELECT * from AfNetExportsService
-select * from currentaccou
+select Year, Country,
+ROUND(SUM(CASE
+			WHEN Indicator = 'Gross Fixed Capital Formation' THEN Nominal
+            WHEN Indicator = 'Change in Inventories' THEN -Nominal
+			else 0
+            END),2) AS [Nominal Investment],
+ROUND(sum(case
+		when indicator = 'Gross Fixed Capital Formation' then Real
+		when indicator = 'Change in Inventories' then -Real
+		else 0
+		end),2) as [Real Investment]
+from Gh_Nig_GDP
+group by Year, Country
 

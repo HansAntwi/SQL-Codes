@@ -208,3 +208,18 @@ select * from AfNetGoodsExport
 
 select * from afnetgoodsexport
 where YEAR = 2014;
+
+
+select Year, Country,
+SUM(CASE
+			WHEN Indicator = 'Gross Fixed Capital Formation' THEN Nominal
+            WHEN Indicator = 'Change in Inventories' THEN -Nominal
+			else 0
+            END) AS [Nominal Investment],
+sum(case
+		when indicator = 'Gross Fixed Capital Formation' then Real
+		when indicator = 'Change in Inventories' then -Real
+		else 0
+		end) as [Real Investment]
+from Gh_Nig_GDP
+group by Year, Country
