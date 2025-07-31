@@ -13,7 +13,7 @@ SElect * from BOP.dbo.nigeria_bop
 where  particulars like '%good%'-- or particulars like '%import%')
 and year = 2014 
 
-
+GO
 ---create view NetGoodsExport
 CREATE VIEW NetGoodsExport AS
 SELECT YEAR,
@@ -25,9 +25,13 @@ SELECT YEAR,
             2 ) AS NetGoodsExport
 FROM   BOP.dbo.nigeria_bop
 group by Year
+GO
 
 select * from NetGoodsExport;
 
+select * from totalNetExports
+where country = 'nigeria'
+order by Country, [Year]
 
 
 --create view NetServicesExport
@@ -44,6 +48,11 @@ FROM   BOP.dbo.nigeria_bop
 GROUP by YEAR
 
  
+ SELECT * FROM NetServicesExport;
+
+select * from totalNetExports
+where country = 'nigeria'
+order by Country, [Year]
 
 --create table NetExport
 create table NetExport (
@@ -81,6 +90,24 @@ from NetExport
 where NetExport is not null;
 
 select * from NetExportview
+
+select * from totalNetExports
+where country = 'nigeria'
+order by Country, [Year]
+
+select Year, Country,
+round(sum(case
+	when Particulars like '%Goods, credit%' then Amount
+	else 0
+end), 2) as Exports,
+round(sum(case
+	when Particulars like '%Goods, debit%' then Amount
+	else 0
+end),2 )as Imports
+from GH_NIG_BOP
+where Country in ('Ghana', 'Nigeria') and Year between 2014 and 2024
+and (Particulars like '%Goods, credit%' or  Particulars like '%Goods, debit%')
+group by Year, Country
 
 ---creating NetPrimaryIncome view
 Create view as NetPrimaryIncome AS
